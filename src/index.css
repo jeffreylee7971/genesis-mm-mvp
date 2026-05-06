@@ -2,95 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Genesis Design System
+   Warm, intentional, premium lifestyle. Cream / Deep Navy / Terracotta / Gold.
+   All colors HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Brand palette */
+    --cream: 36 41% 94%;            /* #F5F0E8 */
+    --cream-deep: 36 30% 88%;
+    --navy: 220 33% 15%;            /* #1A2235 */
+    --navy-soft: 220 25% 25%;
+    --terracotta: 16 53% 50%;       /* #C4623A */
+    --terracotta-soft: 16 50% 60%;
+    --gold: 45 51% 54%;             /* #C9A84C */
+    --gold-soft: 45 55% 70%;
+    --ink: 220 25% 18%;
+    --whisper: 36 25% 80%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Semantic tokens */
+    --background: 36 41% 94%;
+    --foreground: 220 33% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --card: 36 45% 97%;
+    --card-foreground: 220 33% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --popover: 36 45% 97%;
+    --popover-foreground: 220 33% 15%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --primary: 220 33% 15%;
+    --primary-foreground: 36 41% 94%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --secondary: 36 30% 88%;
+    --secondary-foreground: 220 33% 15%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 36 25% 90%;
+    --muted-foreground: 220 15% 38%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 16 53% 50%;
+    --accent-foreground: 36 41% 94%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 36 41% 94%;
 
-    --radius: 0.5rem;
+    --border: 36 20% 82%;
+    --input: 36 20% 82%;
+    --ring: 16 53% 50%;
 
-    --sidebar-background: 0 0% 98%;
+    --radius: 0.75rem;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Gradients */
+    --gradient-warm: linear-gradient(135deg, hsl(36 41% 94%) 0%, hsl(36 35% 89%) 100%);
+    --gradient-sunrise: linear-gradient(160deg, hsl(36 41% 94%) 0%, hsl(36 38% 91%) 50%, hsl(20 35% 88%) 100%);
+    --gradient-navy: linear-gradient(160deg, hsl(220 33% 15%) 0%, hsl(220 30% 20%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(45 51% 54%) 0%, hsl(35 55% 60%) 100%);
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Shadows */
+    --shadow-soft: 0 1px 3px hsl(220 33% 15% / 0.04), 0 8px 24px hsl(220 33% 15% / 0.06);
+    --shadow-letter: 0 2px 6px hsl(220 33% 15% / 0.05), 0 20px 40px -12px hsl(220 33% 15% / 0.12);
+    --shadow-warm: 0 10px 30px -8px hsl(16 53% 50% / 0.25);
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    /* Motion */
+    --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-warm: all 0.4s var(--ease-soft);
 
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 36 41% 94%;
+    --sidebar-foreground: 220 33% 15%;
+    --sidebar-primary: 220 33% 15%;
+    --sidebar-primary-foreground: 36 41% 94%;
+    --sidebar-accent: 36 30% 88%;
+    --sidebar-accent-foreground: 220 33% 15%;
+    --sidebar-border: 36 20% 82%;
+    --sidebar-ring: 16 53% 50%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Genesis is intentionally light. Keep dark as a reasonable inversion. */
+    --background: 220 33% 10%;
+    --foreground: 36 41% 94%;
+    --card: 220 30% 13%;
+    --card-foreground: 36 41% 94%;
+    --popover: 220 30% 13%;
+    --popover-foreground: 36 41% 94%;
+    --primary: 36 41% 94%;
+    --primary-foreground: 220 33% 15%;
+    --secondary: 220 25% 18%;
+    --secondary-foreground: 36 41% 94%;
+    --muted: 220 25% 18%;
+    --muted-foreground: 36 15% 65%;
+    --accent: 16 53% 55%;
+    --accent-foreground: 36 41% 94%;
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 36 41% 94%;
+    --border: 220 20% 22%;
+    --input: 220 20% 22%;
+    --ring: 16 53% 55%;
   }
 }
 
@@ -99,7 +106,39 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1, h2, h3, h4, h5 {
+    @apply font-serif tracking-tight;
+    font-feature-settings: "lnum", "kern";
+  }
+
+  /* Larger tap targets on mobile */
+  button, a, input, textarea, select {
+    @apply touch-manipulation;
+  }
+}
+
+@layer components {
+  .letter-card {
+    @apply bg-card rounded-2xl border border-border/60;
+    box-shadow: var(--shadow-letter);
+  }
+
+  .quiet-input {
+    @apply bg-background/60 border-border/70 focus-visible:ring-accent/40 focus-visible:border-accent/60;
+  }
+
+  .prose-warm p {
+    @apply text-muted-foreground leading-relaxed;
   }
 }
