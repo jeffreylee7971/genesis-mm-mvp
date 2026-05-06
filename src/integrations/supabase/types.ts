@@ -14,16 +14,264 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      conversation_starters: {
+        Row: {
+          generated_at: string
+          id: string
+          match_id: string
+          starters: string[]
+        }
+        Insert: {
+          generated_at?: string
+          id?: string
+          match_id: string
+          starters?: string[]
+        }
+        Update: {
+          generated_at?: string
+          id?: string
+          match_id?: string
+          starters?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_starters_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          compatibility_narrative: string | null
+          compatibility_score: number | null
+          created_at: string
+          id: string
+          initiator: string | null
+          status: Database["public"]["Enums"]["match_status"]
+          updated_at: string
+          user_id_1: string
+          user_id_2: string
+        }
+        Insert: {
+          compatibility_narrative?: string | null
+          compatibility_score?: number | null
+          created_at?: string
+          id?: string
+          initiator?: string | null
+          status?: Database["public"]["Enums"]["match_status"]
+          updated_at?: string
+          user_id_1: string
+          user_id_2: string
+        }
+        Update: {
+          compatibility_narrative?: string | null
+          compatibility_score?: number | null
+          created_at?: string
+          id?: string
+          initiator?: string | null
+          status?: Database["public"]["Enums"]["match_status"]
+          updated_at?: string
+          user_id_1?: string
+          user_id_2?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          match_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          match_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          attachment_signals: Json
+          bio: string | null
+          children_current: number | null
+          children_wanted: number | null
+          created_at: string
+          family_timeline: Database["public"]["Enums"]["family_timeline"] | null
+          lifestyle: Json
+          open_text_future: string | null
+          open_text_parenting: string | null
+          open_text_sunday: string | null
+          open_to_existing_children: string | null
+          parenting_philosophy: Json
+          relationship_structure:
+            | Database["public"]["Enums"]["relationship_structure"]
+            | null
+          semantic_scores: Json | null
+          updated_at: string
+          user_id: string
+          x_readiness_signal: number | null
+        }
+        Insert: {
+          attachment_signals?: Json
+          bio?: string | null
+          children_current?: number | null
+          children_wanted?: number | null
+          created_at?: string
+          family_timeline?:
+            | Database["public"]["Enums"]["family_timeline"]
+            | null
+          lifestyle?: Json
+          open_text_future?: string | null
+          open_text_parenting?: string | null
+          open_text_sunday?: string | null
+          open_to_existing_children?: string | null
+          parenting_philosophy?: Json
+          relationship_structure?:
+            | Database["public"]["Enums"]["relationship_structure"]
+            | null
+          semantic_scores?: Json | null
+          updated_at?: string
+          user_id: string
+          x_readiness_signal?: number | null
+        }
+        Update: {
+          attachment_signals?: Json
+          bio?: string | null
+          children_current?: number | null
+          children_wanted?: number | null
+          created_at?: string
+          family_timeline?:
+            | Database["public"]["Enums"]["family_timeline"]
+            | null
+          lifestyle?: Json
+          open_text_future?: string | null
+          open_text_parenting?: string | null
+          open_text_sunday?: string | null
+          open_to_existing_children?: string | null
+          parenting_philosophy?: Json
+          relationship_structure?:
+            | Database["public"]["Enums"]["relationship_structure"]
+            | null
+          semantic_scores?: Json | null
+          updated_at?: string
+          user_id?: string
+          x_readiness_signal?: number | null
+        }
+        Relationships: []
+      }
+      success: {
+        Row: {
+          id: string
+          marked_matched_at: string
+          partner_found: string | null
+          stripe_paid: boolean
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          marked_matched_at?: string
+          partner_found?: string | null
+          stripe_paid?: boolean
+          user_id: string
+        }
+        Update: {
+          id?: string
+          marked_matched_at?: string
+          partner_found?: string | null
+          stripe_paid?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      users_meta: {
+        Row: {
+          age: number | null
+          city: string | null
+          created_at: string
+          id: string
+          name: string
+          onboarding_complete: boolean
+          paused: boolean
+          photos: string[]
+          updated_at: string
+          x_connected: boolean
+          x_handle: string | null
+        }
+        Insert: {
+          age?: number | null
+          city?: string | null
+          created_at?: string
+          id: string
+          name?: string
+          onboarding_complete?: boolean
+          paused?: boolean
+          photos?: string[]
+          updated_at?: string
+          x_connected?: boolean
+          x_handle?: string | null
+        }
+        Update: {
+          age?: number | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          onboarding_complete?: boolean
+          paused?: boolean
+          photos?: string[]
+          updated_at?: string
+          x_connected?: boolean
+          x_handle?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      user_in_match: {
+        Args: { _match: string; _user: string }
+        Returns: boolean
+      }
+      users_are_mutually_matched: {
+        Args: { _a: string; _b: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      family_timeline:
+        | "within_1_year"
+        | "1_to_2_years"
+        | "2_to_4_years"
+        | "open_but_serious"
+      match_status: "pending" | "mutual" | "connected" | "passed"
+      relationship_structure:
+        | "traditional_marriage"
+        | "open_to_alternatives"
+        | "either"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +398,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      family_timeline: [
+        "within_1_year",
+        "1_to_2_years",
+        "2_to_4_years",
+        "open_but_serious",
+      ],
+      match_status: ["pending", "mutual", "connected", "passed"],
+      relationship_structure: [
+        "traditional_marriage",
+        "open_to_alternatives",
+        "either",
+      ],
+    },
   },
 } as const
