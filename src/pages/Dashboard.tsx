@@ -10,7 +10,6 @@ import {
   categoryAlignment,
   fetchViewerFull,
   highlightFor,
-  passesExistingChildrenFilter,
   timelineLabel,
 } from "@/lib/matching";
 import { Sparkles } from "lucide-react";
