@@ -31,59 +31,61 @@ export default function Dashboard() {
       }
       setViewer(v);
 
-      // Fetch other onboarded users + their profiles. RLS lets us see our own
-      // user_meta plus anyone we're mutually matched with — but for surfacing
-      // candidates we rely on a public-safe view: in this MVP the dashboard
-      // shows recently created profiles via the security definer narrative
-      // pattern. Simplest: read from a public-friendly RPC or just allow
-      // discoverability through a separate read pattern. Here, we'll show
-      // profiles only if they've been explicitly opened up. For demo purposes,
-      // we'll attempt a best-effort read; empty state is welcomed.
-      // (Discoverability rules are intentionally conservative in MVP.)
-      const { data: pool } = await supabase
-        .from("users_meta")
-        .select("id,name,age,city,photos,onboarding_complete")
-        .neq("id", user.id)
-        .eq("onboarding_complete", true)
-        .eq("paused", false)
-        .limit(20);
+      // Generate today's curated matches (no-op if already generated today).
+      await supabase.rpc("generate_daily_matches", { _viewer: user.id });
 
-      // For each, RLS blocks profile reads unless mutually matched. The
-      // dashboard will instead show the candidate's basic card (when reads are
-      // permitted) and the rich profile is only shown on the compat screen
-      // after matching. Here we surface what we can read.
-      const ids = pool?.map((p) => p.id) ?? [];
-      const { data: profiles } = ids.length
-        ? await supabase.from("profiles").select("*").in("user_id", ids)
-        : { data: [] as any[] };
+      // Read today's daily matches for this viewer.
+      const today = new Date().toISOString().slice(0, 10);
+      const { data: dms } = await supabase
+        .from("daily_matches")
+        .select("candidate_id, compatibility_score, highlight")
+        .eq("viewer_id", user.id)
+        .eq("match_date", today)
+        .order("compatibility_score", { ascending: false });
 
+      const ids = (dms ?? []).map((d) => d.candidate_id);
+      if (!ids.length) {
+        setCandidates([]);
+        setLoading(false);
+        return;
+      }
+
+      const [{ data: metas }, { data: profiles }] = await Promise.all([
+        supabase.from("users_meta").select("id,name,age,city,photos").in("id", ids),
+        supabase.from("profiles").select("*").in("user_id", ids),
+      ]);
+
+      const metaMap = new Map((metas ?? []).map((m: any) => [m.id, m]));
       const profileMap = new Map((profiles ?? []).map((p: any) => [p.user_id, p]));
-      const merged: CandidateProfile[] = (pool ?? []).map((m: any) => {
-        const p = profileMap.get(m.id) || {};
-        return {
-          user_id: m.id,
-          name: m.name,
-          age: m.age,
-          city: m.city,
-          photos: m.photos ?? [],
-          family_timeline: p.family_timeline ?? null,
-          children_current: p.children_current ?? null,
-          children_wanted: p.children_wanted ?? null,
-          open_to_existing_children: p.open_to_existing_children ?? null,
-          parenting_philosophy: p.parenting_philosophy ?? {},
-          lifestyle: p.lifestyle ?? {},
-          relationship_structure: p.relationship_structure ?? null,
-          attachment_signals: p.attachment_signals ?? {},
-          open_text_sunday: p.open_text_sunday ?? null,
-          open_text_parenting: p.open_text_parenting ?? null,
-          open_text_future: p.open_text_future ?? null,
-          bio: p.bio ?? null,
-        };
-      });
 
-      const filtered = merged.filter((c) => passesExistingChildrenFilter(v, c));
-      filtered.sort((a, b) => categoryAlignment(v, b).score - categoryAlignment(v, a).score);
-      setCandidates(filtered.slice(0, 5));
+      const merged: CandidateProfile[] = (dms ?? [])
+        .map((d) => {
+          const m: any = metaMap.get(d.candidate_id);
+          const p: any = profileMap.get(d.candidate_id) ?? {};
+          if (!m) return null;
+          return {
+            user_id: d.candidate_id,
+            name: m.name,
+            age: m.age,
+            city: m.city,
+            photos: m.photos ?? [],
+            family_timeline: p.family_timeline ?? null,
+            children_current: p.children_current ?? null,
+            children_wanted: p.children_wanted ?? null,
+            open_to_existing_children: p.open_to_existing_children ?? null,
+            parenting_philosophy: p.parenting_philosophy ?? {},
+            lifestyle: p.lifestyle ?? {},
+            relationship_structure: p.relationship_structure ?? null,
+            attachment_signals: p.attachment_signals ?? {},
+            open_text_sunday: p.open_text_sunday ?? null,
+            open_text_parenting: p.open_text_parenting ?? null,
+            open_text_future: p.open_text_future ?? null,
+            bio: p.bio ?? null,
+          } as CandidateProfile;
+        })
+        .filter(Boolean) as CandidateProfile[];
+
+      setCandidates(merged);
       setLoading(false);
     })();
   }, [user]);
