@@ -43,6 +43,36 @@ export type Database = {
           },
         ]
       }
+      daily_matches: {
+        Row: {
+          candidate_id: string
+          compatibility_score: number
+          created_at: string
+          highlight: string | null
+          id: string
+          match_date: string
+          viewer_id: string
+        }
+        Insert: {
+          candidate_id: string
+          compatibility_score?: number
+          created_at?: string
+          highlight?: string | null
+          id?: string
+          match_date?: string
+          viewer_id: string
+        }
+        Update: {
+          candidate_id?: string
+          compatibility_score?: number
+          created_at?: string
+          highlight?: string | null
+          id?: string
+          match_date?: string
+          viewer_id?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           compatibility_narrative: string | null
@@ -252,6 +282,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_daily_matches: { Args: { _viewer: string }; Returns: number }
       user_in_match: {
         Args: { _match: string; _user: string }
         Returns: boolean
