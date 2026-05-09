@@ -23,6 +23,7 @@ export default function MatchDetail() {
   const [c, setC] = useState<CandidateProfile | null>(null);
   const [matchStatus, setMatchStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const userId = user?.id;
   useEffect(() => {
