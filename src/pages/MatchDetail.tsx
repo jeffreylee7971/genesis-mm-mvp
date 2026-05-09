@@ -79,23 +79,31 @@ export default function MatchDetail() {
         .maybeSingle();
 
       if (!existing) {
-        const { error } = await supabase.from("matches").insert({
-          user_id_1: a,
-          user_id_2: b,
-          status: "pending" as any,
-          initiator: user.id,
-        });
+        const { data: inserted, error } = await supabase
+          .from("matches")
+          .insert({
+            user_id_1: a,
+            user_id_2: b,
+            status: "pending" as any,
+            initiator: user.id,
+          })
+          .select()
+          .single();
         if (error) throw error;
+        if (!inserted) throw new Error("Insert returned no row");
         setMatchStatus("pending");
         toast.success("Interest expressed. We'll let you know if it's mutual.");
       } else if (existing.initiator && existing.initiator !== user.id && existing.status === "pending") {
         const score = viewer && c ? categoryAlignment(viewer, c).score : null;
         const narrative = viewer && c ? placeholderNarrative(viewer, c) : null;
-        const { error } = await supabase
+        const { data: updated, error } = await supabase
           .from("matches")
           .update({ status: "mutual" as any, compatibility_score: score, compatibility_narrative: narrative })
-          .eq("id", existing.id);
+          .eq("id", existing.id)
+          .select()
+          .single();
         if (error) throw error;
+        if (!updated) throw new Error("Update returned no row");
         setMatchStatus("mutual");
         toast.success("It's mutual. You can now message each other.");
       } else {
