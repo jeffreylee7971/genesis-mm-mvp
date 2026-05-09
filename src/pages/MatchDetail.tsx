@@ -23,11 +23,15 @@ export default function MatchDetail() {
   const [c, setC] = useState<CandidateProfile | null>(null);
   const [matchStatus, setMatchStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
+  const userId = user?.id;
   useEffect(() => {
-    if (!user || !id) return;
+    if (!userId || !id) return;
+    let cancelled = false;
     (async () => {
-      const v = await fetchViewerFull(user.id);
+      const v = await fetchViewerFull(userId);
+      if (cancelled) return;
       setViewer(v);
       const [{ data: meta }, { data: profile }] = await Promise.all([
         supabase.from("users_meta").select("*").eq("id", id).maybeSingle(),
@@ -55,16 +59,19 @@ export default function MatchDetail() {
         });
       }
       // Existing match?
-      const [a, b] = [user.id, id].sort();
+      const [a, b] = [userId, id].sort();
       const { data: m } = await supabase
         .from("matches")
         .select("*")
         .eq("user_id_1", a)
         .eq("user_id_2", b)
         .maybeSingle();
+      if (cancelled) return;
       if (m) setMatchStatus(m.status);
+      setLoaded(true);
     })();
-  }, [user, id]);
+    return () => { cancelled = true; };
+  }, [userId, id]);
 
   const expressInterest = async () => {
     if (!user || !id) return;
@@ -116,10 +123,22 @@ export default function MatchDetail() {
     }
   };
 
-  if (!c || !viewer)
+  if (!loaded || !viewer)
     return (
       <AppShell>
         <div className="container max-w-3xl pt-10 text-navy/50">Loading…</div>
+      </AppShell>
+    );
+
+  if (!c)
+    return (
+      <AppShell>
+        <div className="container max-w-3xl pt-10">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
+            <ArrowLeft className="size-4" /> Back
+          </Button>
+          <p className="text-navy/60">This profile isn't available to you right now.</p>
+        </div>
       </AppShell>
     );
 
