@@ -58,16 +58,19 @@ export default function MatchDetail() {
         });
       }
       // Existing match?
-      const [a, b] = [user.id, id].sort();
+      const [a, b] = [userId, id].sort();
       const { data: m } = await supabase
         .from("matches")
         .select("*")
         .eq("user_id_1", a)
         .eq("user_id_2", b)
         .maybeSingle();
+      if (cancelled) return;
       if (m) setMatchStatus(m.status);
+      setLoaded(true);
     })();
-  }, [user, id]);
+    return () => { cancelled = true; };
+  }, [userId, id]);
 
   const expressInterest = async () => {
     if (!user || !id) return;
