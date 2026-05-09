@@ -24,10 +24,13 @@ export default function MatchDetail() {
   const [matchStatus, setMatchStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
+  const userId = user?.id;
   useEffect(() => {
-    if (!user || !id) return;
+    if (!userId || !id) return;
+    let cancelled = false;
     (async () => {
-      const v = await fetchViewerFull(user.id);
+      const v = await fetchViewerFull(userId);
+      if (cancelled) return;
       setViewer(v);
       const [{ data: meta }, { data: profile }] = await Promise.all([
         supabase.from("users_meta").select("*").eq("id", id).maybeSingle(),
