@@ -123,10 +123,22 @@ export default function MatchDetail() {
     }
   };
 
-  if (!c || !viewer)
+  if (!loaded || !viewer)
     return (
       <AppShell>
         <div className="container max-w-3xl pt-10 text-navy/50">Loading…</div>
+      </AppShell>
+    );
+
+  if (!c)
+    return (
+      <AppShell>
+        <div className="container max-w-3xl pt-10">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
+            <ArrowLeft className="size-4" /> Back
+          </Button>
+          <p className="text-navy/60">This profile isn't available to you right now.</p>
+        </div>
       </AppShell>
     );
 
