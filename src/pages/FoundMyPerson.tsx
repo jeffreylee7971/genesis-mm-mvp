@@ -15,6 +15,18 @@ export default function FoundMyPerson() {
   const [partner, setPartner] = useState("");
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("success")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setDone(true);
+      });
+  }, [user]);
+
   const celebrate = async (paid: boolean) => {
     if (!user) return;
     setBusy(true);
