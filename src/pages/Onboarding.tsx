@@ -27,6 +27,8 @@ type State = {
   name: string;
   age: string;
   city: string;
+  gender: "woman" | "man" | "";
+  seeking: "men" | "women" | "everyone" | "";
   photos: string[];
   intent: "yes" | "later" | null;
   // family
