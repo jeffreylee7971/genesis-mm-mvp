@@ -21,9 +21,9 @@ export default function FoundMyPerson() {
       .from("success")
       .select("id")
       .eq("user_id", user.id)
-      .maybeSingle()
+      .limit(1)
       .then(({ data }) => {
-        if (data) setDone(true);
+        if (data && data.length > 0) setDone(true);
       });
   }, [user]);
 
@@ -45,7 +45,7 @@ export default function FoundMyPerson() {
         .from("users_meta")
         .update({ paused: true })
         .eq("id", user.id);
-      if (pauseErr) throw pauseErr;
+      if (pauseErr) console.warn("Could not pause profile:", pauseErr.message);
 
       setDone(true);
     } catch (e: any) {
