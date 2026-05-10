@@ -240,11 +240,13 @@ export type Database = {
           age: number | null
           city: string | null
           created_at: string
+          gender: Database["public"]["Enums"]["gender"] | null
           id: string
           name: string
           onboarding_complete: boolean
           paused: boolean
           photos: string[]
+          seeking: Database["public"]["Enums"]["seeking"] | null
           updated_at: string
           x_connected: boolean
           x_handle: string | null
@@ -253,11 +255,13 @@ export type Database = {
           age?: number | null
           city?: string | null
           created_at?: string
+          gender?: Database["public"]["Enums"]["gender"] | null
           id: string
           name?: string
           onboarding_complete?: boolean
           paused?: boolean
           photos?: string[]
+          seeking?: Database["public"]["Enums"]["seeking"] | null
           updated_at?: string
           x_connected?: boolean
           x_handle?: string | null
@@ -266,11 +270,13 @@ export type Database = {
           age?: number | null
           city?: string | null
           created_at?: string
+          gender?: Database["public"]["Enums"]["gender"] | null
           id?: string
           name?: string
           onboarding_complete?: boolean
           paused?: boolean
           photos?: string[]
+          seeking?: Database["public"]["Enums"]["seeking"] | null
           updated_at?: string
           x_connected?: boolean
           x_handle?: string | null
@@ -298,11 +304,13 @@ export type Database = {
         | "1_to_2_years"
         | "2_to_4_years"
         | "open_but_serious"
+      gender: "woman" | "man"
       match_status: "pending" | "mutual" | "connected" | "passed"
       relationship_structure:
         | "traditional_marriage"
         | "open_to_alternatives"
         | "either"
+      seeking: "men" | "women" | "everyone"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -436,12 +444,14 @@ export const Constants = {
         "2_to_4_years",
         "open_but_serious",
       ],
+      gender: ["woman", "man"],
       match_status: ["pending", "mutual", "connected", "passed"],
       relationship_structure: [
         "traditional_marriage",
         "open_to_alternatives",
         "either",
       ],
+      seeking: ["men", "women", "everyone"],
     },
   },
 } as const
