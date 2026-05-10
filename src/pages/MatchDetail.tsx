@@ -15,13 +15,19 @@ import {
 import { toast } from "sonner";
 import { ArrowLeft, Heart } from "lucide-react";
 
+type MatchRow = {
+  id: string;
+  status: "pending" | "mutual" | "connected" | "passed";
+  initiator: string | null;
+};
+
 export default function MatchDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [viewer, setViewer] = useState<ViewerProfile | null>(null);
   const [c, setC] = useState<CandidateProfile | null>(null);
-  const [matchRow, setMatchRow] = useState<{ id: string; status: string; initiator: string | null } | null>(null);
+  const [matchRow, setMatchRow] = useState<MatchRow | null>(null);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
@@ -30,45 +36,61 @@ export default function MatchDetail() {
     if (!userId || !id) return;
     let cancelled = false;
     (async () => {
-      const v = await fetchViewerFull(userId);
-      if (cancelled) return;
-      setViewer(v);
-      const [{ data: meta }, { data: profile }] = await Promise.all([
-        supabase.from("users_meta").select("*").eq("id", id).maybeSingle(),
-        supabase.from("profiles").select("*").eq("user_id", id).maybeSingle(),
-      ]);
-      if (meta) {
-        setC({
-          user_id: id,
-          name: meta.name,
-          age: meta.age,
-          city: meta.city,
-          photos: meta.photos ?? [],
-          family_timeline: profile?.family_timeline ?? null,
-          children_current: profile?.children_current ?? null,
-          children_wanted: profile?.children_wanted ?? null,
-          open_to_existing_children: profile?.open_to_existing_children ?? null,
-          parenting_philosophy: (profile?.parenting_philosophy as any) ?? {},
-          lifestyle: (profile?.lifestyle as any) ?? {},
-          relationship_structure: profile?.relationship_structure ?? null,
-          attachment_signals: (profile?.attachment_signals as any) ?? {},
-          open_text_sunday: profile?.open_text_sunday ?? null,
-          open_text_parenting: profile?.open_text_parenting ?? null,
-          open_text_future: profile?.open_text_future ?? null,
-          bio: profile?.bio ?? null,
-        });
+      setLoaded(false);
+      setMatchRow(null);
+      setC(null);
+      try {
+        const [v, candidateResult, matchResult] = await Promise.all([
+          fetchViewerFull(userId),
+          Promise.all([
+            supabase.from("users_meta").select("*").eq("id", id).maybeSingle(),
+            supabase.from("profiles").select("*").eq("user_id", id).maybeSingle(),
+          ]),
+          (() => {
+            const [a, b] = [userId, id].sort();
+            return supabase
+              .from("matches")
+              .select("id, status, initiator")
+              .eq("user_id_1", a)
+              .eq("user_id_2", b)
+              .maybeSingle();
+          })(),
+        ]);
+
+        if (cancelled) return;
+
+        const [[{ data: meta }, { data: profile }], { data: m }] = [candidateResult, matchResult];
+
+        setViewer(v);
+        setC(
+          meta
+            ? {
+                user_id: id,
+                name: meta.name,
+                age: meta.age,
+                city: meta.city,
+                photos: meta.photos ?? [],
+                family_timeline: profile?.family_timeline ?? null,
+                children_current: profile?.children_current ?? null,
+                children_wanted: profile?.children_wanted ?? null,
+                open_to_existing_children: profile?.open_to_existing_children ?? null,
+                parenting_philosophy: (profile?.parenting_philosophy as any) ?? {},
+                lifestyle: (profile?.lifestyle as any) ?? {},
+                relationship_structure: profile?.relationship_structure ?? null,
+                attachment_signals: (profile?.attachment_signals as any) ?? {},
+                open_text_sunday: profile?.open_text_sunday ?? null,
+                open_text_parenting: profile?.open_text_parenting ?? null,
+                open_text_future: profile?.open_text_future ?? null,
+                bio: profile?.bio ?? null,
+              }
+            : null,
+        );
+        setMatchRow(m ? { id: m.id, status: m.status, initiator: m.initiator } : null);
+      } catch (e: any) {
+        if (!cancelled) toast.error(e.message ?? "Could not load this match.");
+      } finally {
+        if (!cancelled) setLoaded(true);
       }
-      // Existing match?
-      const [a, b] = [userId, id].sort();
-      const { data: m } = await supabase
-        .from("matches")
-        .select("*")
-        .eq("user_id_1", a)
-        .eq("user_id_2", b)
-        .maybeSingle();
-      if (cancelled) return;
-      if (m) setMatchRow({ id: m.id, status: m.status, initiator: m.initiator });
-      setLoaded(true);
     })();
     return () => { cancelled = true; };
   }, [userId, id]);
@@ -123,10 +145,22 @@ export default function MatchDetail() {
     }
   };
 
-  if (!loaded || !viewer)
+  if (!loaded)
     return (
       <AppShell>
         <div className="container max-w-3xl pt-10 text-navy/50">Loading…</div>
+      </AppShell>
+    );
+
+  if (!viewer)
+    return (
+      <AppShell>
+        <div className="container max-w-3xl pt-10">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
+            <ArrowLeft className="size-4" /> Back
+          </Button>
+          <p className="text-navy/60">We couldn't load your profile right now.</p>
+        </div>
       </AppShell>
     );
 
