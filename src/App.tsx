@@ -14,6 +14,8 @@ import Messages from "./pages/Messages.tsx";
 import Profile from "./pages/Profile.tsx";
 import FoundMyPerson from "./pages/FoundMyPerson.tsx";
 import PaymentSuccess from "./pages/PaymentSuccess.tsx";
+import Admin from "./pages/Admin.tsx";
+import AdminRoute from "./components/AdminRoute.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -77,6 +79,14 @@ const App = () => (
               }
             />
             <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <Admin />
+                </AdminRoute>
+              }
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
