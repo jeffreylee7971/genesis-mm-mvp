@@ -50,6 +50,8 @@ const initial: State = {
   name: "",
   age: "",
   city: "",
+  gender: "",
+  seeking: "",
   photos: [],
   intent: null,
   family_timeline: "",
