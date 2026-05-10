@@ -27,6 +27,8 @@ type State = {
   name: string;
   age: string;
   city: string;
+  gender: "woman" | "man" | "";
+  seeking: "men" | "women" | "everyone" | "";
   photos: string[];
   intent: "yes" | "later" | null;
   // family
@@ -48,6 +50,8 @@ const initial: State = {
   name: "",
   age: "",
   city: "",
+  gender: "",
+  seeking: "",
   photos: [],
   intent: null,
   family_timeline: "",
@@ -84,6 +88,8 @@ export default function Onboarding() {
         name: meta?.name || (user.user_metadata?.name as string) || "",
         age: meta?.age?.toString() || "",
         city: meta?.city || "",
+        gender: (meta?.gender as any) || "",
+        seeking: (meta?.seeking as any) || "",
         photos: meta?.photos || [],
         family_timeline: profile?.family_timeline || "",
         children_current: profile?.children_current?.toString() || "0",
@@ -117,6 +123,8 @@ export default function Onboarding() {
           name: s.name,
           age: ageNum,
           city: s.city,
+          gender: (s.gender || null) as any,
+          seeking: (s.seeking || null) as any,
           photos: s.photos,
           onboarding_complete: true,
         })
@@ -156,7 +164,7 @@ export default function Onboarding() {
       case 1: return s.intent === "yes";
       case 2: {
         const a = parseInt(s.age, 10);
-        return s.name.trim().length > 0 && a >= 25 && a <= 55 && s.city.trim().length > 0;
+        return s.name.trim().length > 0 && a >= 25 && a <= 55 && s.city.trim().length > 0 && !!s.gender && !!s.seeking;
       }
       case 3: return s.photos.length >= 1;
       case 4: return !!s.family_timeline;
@@ -238,6 +246,31 @@ export default function Onboarding() {
                   <Label htmlFor="c">City</Label>
                   <Input id="c" className="quiet-input mt-2 h-12" value={s.city} onChange={(e) => set("city", e.target.value)} />
                 </div>
+              </div>
+              <div>
+                <Label className="mb-3 block">I am a…</Label>
+                <ChoiceGroup
+                  cols={2}
+                  options={[
+                    { value: "woman", label: "Woman" },
+                    { value: "man", label: "Man" },
+                  ]}
+                  value={s.gender}
+                  onChange={(v) => set("gender", v as any)}
+                />
+              </div>
+              <div>
+                <Label className="mb-3 block">I'm looking for…</Label>
+                <ChoiceGroup
+                  cols={2}
+                  options={[
+                    { value: "men", label: "Men" },
+                    { value: "women", label: "Women" },
+                    { value: "everyone", label: "Everyone" },
+                  ]}
+                  value={s.seeking}
+                  onChange={(v) => set("seeking", v as any)}
+                />
               </div>
             </div>
           </Step>
