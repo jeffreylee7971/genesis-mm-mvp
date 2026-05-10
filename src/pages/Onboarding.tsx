@@ -262,7 +262,7 @@ export default function Onboarding() {
               <div>
                 <Label className="mb-3 block">I'm looking for…</Label>
                 <ChoiceGroup
-                  cols={3}
+                  cols={2}
                   options={[
                     { value: "men", label: "Men" },
                     { value: "women", label: "Women" },
