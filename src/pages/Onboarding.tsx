@@ -123,6 +123,8 @@ export default function Onboarding() {
           name: s.name,
           age: ageNum,
           city: s.city,
+          gender: (s.gender || null) as any,
+          seeking: (s.seeking || null) as any,
           photos: s.photos,
           onboarding_complete: true,
         })
