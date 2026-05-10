@@ -12,6 +12,7 @@ import {
   timelineLabel,
   ViewerProfile,
 } from "@/lib/matching";
+import { generateNarrative } from "@/lib/narrative";
 import { getMatchCtaState, getMatchDetailViewState, MatchRow } from "@/lib/match-detail";
 import { toast } from "sonner";
 import { ArrowLeft, Heart } from "lucide-react";
@@ -25,6 +26,7 @@ export default function MatchDetail() {
   const [matchRow, setMatchRow] = useState<MatchRow | null>(null);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [narrative, setNarrative] = useState<string | null>(null);
 
   const userId = user?.id;
   useEffect(() => {
@@ -45,7 +47,7 @@ export default function MatchDetail() {
             const [a, b] = [userId, id].sort();
             return supabase
               .from("matches")
-              .select("id, status, initiator")
+              .select("id, status, initiator, compatibility_narrative")
               .eq("user_id_1", a)
               .eq("user_id_2", b)
               .maybeSingle();
@@ -55,6 +57,12 @@ export default function MatchDetail() {
         if (cancelled) return;
 
         const [[{ data: meta }, { data: profile }], { data: m }] = [candidateResult, matchResult];
+
+        // Use stored narrative from DB if available, then generate via Claude
+        const storedNarrative = m?.compatibility_narrative ?? null;
+        if (storedNarrative) {
+          setNarrative(storedNarrative);
+        }
 
         setViewer(v);
         setC(
@@ -81,6 +89,32 @@ export default function MatchDetail() {
             : null,
         );
         setMatchRow(m ? { id: m.id, status: m.status, initiator: m.initiator } : null);
+
+        // Generate narrative via Claude if not already stored
+        if (!storedNarrative && v && meta) {
+          const candidate: CandidateProfile = {
+            user_id: id!,
+            name: meta.name,
+            age: meta.age,
+            city: meta.city,
+            photos: meta.photos ?? [],
+            family_timeline: profile?.family_timeline ?? null,
+            children_current: profile?.children_current ?? null,
+            children_wanted: profile?.children_wanted ?? null,
+            open_to_existing_children: profile?.open_to_existing_children ?? null,
+            parenting_philosophy: (profile?.parenting_philosophy as any) ?? {},
+            lifestyle: (profile?.lifestyle as any) ?? {},
+            relationship_structure: profile?.relationship_structure ?? null,
+            attachment_signals: (profile?.attachment_signals as any) ?? {},
+            open_text_sunday: profile?.open_text_sunday ?? null,
+            open_text_parenting: profile?.open_text_parenting ?? null,
+            open_text_future: profile?.open_text_future ?? null,
+            bio: profile?.bio ?? null,
+          };
+          generateNarrative(v, candidate).then((text) => {
+            if (!cancelled) setNarrative(text);
+          });
+        }
       } catch (e: any) {
         if (!cancelled) toast.error(e.message ?? "Could not load this match.");
       } finally {
@@ -119,10 +153,10 @@ export default function MatchDetail() {
         toast.success("Interest expressed. We'll let you know if it's mutual.");
       } else if (existing.initiator && existing.initiator !== user.id && existing.status === "pending") {
         const score = viewer && c ? categoryAlignment(viewer, c).score : null;
-        const narrative = viewer && c ? placeholderNarrative(viewer, c) : null;
+        const savedNarrative = narrative ?? (viewer && c ? placeholderNarrative(viewer, c) : null);
         const { data: updated, error } = await supabase
           .from("matches")
-          .update({ status: "mutual" as any, compatibility_score: score, compatibility_narrative: narrative })
+          .update({ status: "mutual" as any, compatibility_score: score, compatibility_narrative: savedNarrative })
           .eq("id", existing.id)
           .select()
           .single();
@@ -175,7 +209,6 @@ export default function MatchDetail() {
     );
 
   const align = categoryAlignment(viewer, c);
-  const narrative = placeholderNarrative(viewer, c);
 
   return (
     <AppShell>
@@ -212,7 +245,15 @@ export default function MatchDetail() {
         {/* Compatibility narrative */}
         <div className="letter-card mb-8 p-7 animate-fade-up">
           <p className="text-xs uppercase tracking-[0.2em] text-terracotta">Why we think you'd connect</p>
-          <p className="mt-3 font-serif text-xl leading-relaxed text-navy">{narrative}</p>
+          {narrative ? (
+            <p className="mt-3 font-serif text-xl leading-relaxed text-navy">{narrative}</p>
+          ) : (
+            <div className="mt-3 space-y-2">
+              <div className="h-5 w-full animate-pulse rounded bg-cream-deep" />
+              <div className="h-5 w-4/5 animate-pulse rounded bg-cream-deep" />
+              <div className="h-5 w-3/5 animate-pulse rounded bg-cream-deep" />
+            </div>
+          )}
         </div>
 
         {/* Category alignment */}
