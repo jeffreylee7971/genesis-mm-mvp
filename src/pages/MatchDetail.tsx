@@ -67,7 +67,7 @@ export default function MatchDetail() {
         .eq("user_id_2", b)
         .maybeSingle();
       if (cancelled) return;
-      if (m) setMatchStatus(m.status);
+      if (m) setMatchRow({ id: m.id, status: m.status, initiator: m.initiator });
       setLoaded(true);
     })();
     return () => { cancelled = true; };
@@ -98,7 +98,7 @@ export default function MatchDetail() {
           .single();
         if (error) throw error;
         if (!inserted) throw new Error("Insert returned no row");
-        setMatchStatus("pending");
+        setMatchRow({ id: inserted.id, status: "pending", initiator: user.id });
         toast.success("Interest expressed. We'll let you know if it's mutual.");
       } else if (existing.initiator && existing.initiator !== user.id && existing.status === "pending") {
         const score = viewer && c ? categoryAlignment(viewer, c).score : null;
@@ -111,7 +111,7 @@ export default function MatchDetail() {
           .single();
         if (error) throw error;
         if (!updated) throw new Error("Update returned no row");
-        setMatchStatus("mutual");
+        setMatchRow({ id: updated.id, status: "mutual", initiator: existing.initiator });
         toast.success("It's mutual. You can now message each other.");
       } else {
         toast("You've already expressed interest.");
@@ -215,11 +215,11 @@ export default function MatchDetail() {
 
         {/* CTA */}
         <div className="sticky bottom-20 z-20 sm:bottom-6">
-          {matchStatus === "mutual" || matchStatus === "connected" ? (
+          {matchRow?.status === "mutual" || matchRow?.status === "connected" ? (
             <Button asChild variant="warm" size="xl" className="w-full">
               <Link to="/messages">Message {c.name.split(" ")[0]}</Link>
             </Button>
-          ) : matchStatus === "pending" ? (
+          ) : matchRow?.status === "pending" && matchRow.initiator === user?.id ? (
             <Button disabled variant="quiet" size="xl" className="w-full">
               Interest expressed
             </Button>
