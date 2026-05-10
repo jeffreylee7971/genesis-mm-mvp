@@ -164,7 +164,7 @@ export default function Onboarding() {
       case 1: return s.intent === "yes";
       case 2: {
         const a = parseInt(s.age, 10);
-        return s.name.trim().length > 0 && a >= 25 && a <= 55 && s.city.trim().length > 0;
+        return s.name.trim().length > 0 && a >= 25 && a <= 55 && s.city.trim().length > 0 && !!s.gender && !!s.seeking;
       }
       case 3: return s.photos.length >= 1;
       case 4: return !!s.family_timeline;
