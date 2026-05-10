@@ -247,6 +247,31 @@ export default function Onboarding() {
                   <Input id="c" className="quiet-input mt-2 h-12" value={s.city} onChange={(e) => set("city", e.target.value)} />
                 </div>
               </div>
+              <div>
+                <Label className="mb-3 block">I am a…</Label>
+                <ChoiceGroup
+                  cols={2}
+                  options={[
+                    { value: "woman", label: "Woman" },
+                    { value: "man", label: "Man" },
+                  ]}
+                  value={s.gender}
+                  onChange={(v) => set("gender", v as any)}
+                />
+              </div>
+              <div>
+                <Label className="mb-3 block">I'm looking for…</Label>
+                <ChoiceGroup
+                  cols={3}
+                  options={[
+                    { value: "men", label: "Men" },
+                    { value: "women", label: "Women" },
+                    { value: "everyone", label: "Everyone" },
+                  ]}
+                  value={s.seeking}
+                  onChange={(v) => set("seeking", v as any)}
+                />
+              </div>
             </div>
           </Step>
         )}
