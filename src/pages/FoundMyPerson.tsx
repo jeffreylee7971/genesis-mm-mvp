@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,18 @@ export default function FoundMyPerson() {
   const [done, setDone] = useState(false);
   const [partner, setPartner] = useState("");
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("success")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setDone(true);
+      });
+  }, [user]);
 
   const celebrate = async (paid: boolean) => {
     if (!user) return;
