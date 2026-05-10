@@ -245,7 +245,7 @@ export default function MatchDetail() {
         </header>
 
         {/* Compatibility narrative */}
-        <div className="letter-card mb-8 p-7 animate-fade-up">
+        <div className="letter-card mb-6 p-5 md:p-7 animate-fade-up">
           <p className="text-xs uppercase tracking-[0.2em] text-terracotta">Why we think you'd connect</p>
           {narrative ? (
             <p className="mt-3 font-serif text-xl leading-relaxed text-navy">{narrative}</p>
@@ -268,7 +268,7 @@ export default function MatchDetail() {
 
         {/* Open text excerpts */}
         {(c.open_text_sunday || c.open_text_parenting || c.open_text_future) && (
-          <div className="letter-card mb-8 space-y-6 p-7">
+          <div className="letter-card mb-6 space-y-6 p-5 md:p-7">
             {c.open_text_sunday && (
               <Quote label="An ideal Sunday morning">{c.open_text_sunday}</Quote>
             )}
@@ -282,14 +282,14 @@ export default function MatchDetail() {
         )}
 
         {c.bio && (
-          <div className="letter-card mb-8 p-7">
+          <div className="letter-card mb-6 p-5 md:p-7">
             <p className="text-xs uppercase tracking-[0.2em] text-terracotta">A note from {c.name.split(" ")[0]}</p>
             <p className="mt-3 leading-relaxed text-navy/80">{c.bio}</p>
           </div>
         )}
 
         {/* CTA */}
-        <div className="sticky bottom-20 z-20 sm:bottom-6">
+        <div className="sticky bottom-28 z-20 sm:bottom-6">
           {ctaState === "message" ? (
             <Button asChild variant="warm" size="xl" className="w-full">
               <Link to="/messages">Message {c.name.split(" ")[0]}</Link>

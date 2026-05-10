@@ -50,12 +50,12 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-sunrise">
-      <div className="container max-w-md py-16">
+      <div className="container max-w-md pt-10 pb-16 md:py-16">
         <Link to="/" className="font-serif text-3xl text-navy">
           Genesis
         </Link>
 
-        <div className="letter-card mt-10 p-8 animate-fade-up">
+        <div className="letter-card mt-8 p-6 md:p-8 animate-fade-up">
           <h1 className="font-serif text-3xl text-navy">
             {mode === "signup" ? "Begin Genesis" : "Welcome back"}
           </h1>

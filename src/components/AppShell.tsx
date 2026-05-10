@@ -25,14 +25,17 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="pb-24 sm:pb-12">{children}</main>
+      <main className="pb-28 sm:pb-12">{children}</main>
 
       {user && (
-        <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/40 bg-background/95 backdrop-blur-md sm:hidden">
+        <nav
+          className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/40 bg-background/95 backdrop-blur-md sm:hidden"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
           <div className="grid grid-cols-3">
-            <BottomLink to="/dashboard" icon={<Home className="size-5" />} label="Matches" current={location.pathname} />
-            <BottomLink to="/messages" icon={<MessageCircle className="size-5" />} label="Messages" current={location.pathname} />
-            <BottomLink to="/profile" icon={<User className="size-5" />} label="Profile" current={location.pathname} />
+            <BottomLink to="/dashboard" icon={<Home className="size-6" />} label="Matches" current={location.pathname} />
+            <BottomLink to="/messages" icon={<MessageCircle className="size-6" />} label="Messages" current={location.pathname} />
+            <BottomLink to="/profile" icon={<User className="size-6" />} label="Profile" current={location.pathname} />
           </div>
         </nav>
       )}
@@ -62,7 +65,7 @@ function BottomLink({ to, icon, label, current }: { to: string; icon: ReactNode;
     <Link
       to={to}
       className={cn(
-        "flex flex-col items-center gap-1 py-3 text-xs transition-colors",
+        "flex min-h-[3rem] flex-col items-center justify-center gap-1 py-2 text-xs transition-colors",
         active ? "text-terracotta" : "text-navy/60",
       )}
     >

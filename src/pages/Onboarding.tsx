@@ -186,12 +186,12 @@ export default function Onboarding() {
   }, [step, s]);
 
   return (
-    <div className="min-h-screen bg-gradient-sunrise pb-32 pt-10">
+    <div className="min-h-screen bg-gradient-sunrise pb-32 pt-6">
       <div className="container max-w-2xl">
         {step === 1 && (
           <Step>
             <StepHeader step={1} total={TOTAL_STEPS} title="Is Genesis right for you?" />
-            <div className="letter-card p-8">
+            <div className="letter-card p-5 md:p-8">
               <p className="font-serif text-xl leading-relaxed text-navy">
                 Genesis is built for people who are actively looking for a partner to start or grow a family with.
               </p>
@@ -226,7 +226,7 @@ export default function Onboarding() {
         {step === 2 && (
           <Step>
             <StepHeader step={2} total={TOTAL_STEPS} title="A few basics about you." />
-            <div className="space-y-5 letter-card p-8">
+            <div className="space-y-5 letter-card p-5 md:p-8">
               <div>
                 <Label htmlFor="n">First name</Label>
                 <Input id="n" className="quiet-input mt-2 h-12" value={s.name} onChange={(e) => set("name", e.target.value)} />
@@ -282,7 +282,7 @@ export default function Onboarding() {
         {step === 3 && user && (
           <Step>
             <StepHeader step={3} total={TOTAL_STEPS} title="Add a few photos." intro="Up to six. Choose ones that feel like you on a good ordinary day." />
-            <div className="letter-card p-8">
+            <div className="letter-card p-5 md:p-8">
               <PhotoUploader userId={user.id} photos={s.photos} onChange={(p) => set("photos", p)} />
             </div>
           </Step>
@@ -298,7 +298,7 @@ export default function Onboarding() {
         {step === 5 && (
           <Step>
             <StepHeader step={5} total={TOTAL_STEPS} eyebrow="Children" title="Tell us about children." />
-            <div className="space-y-6 letter-card p-8">
+            <div className="space-y-6 letter-card p-5 md:p-8">
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="cc">Children you have now</Label>
@@ -436,7 +436,7 @@ export default function Onboarding() {
         {step === 14 && (
           <Step>
             <StepHeader step={14} total={TOTAL_STEPS} eyebrow="One last look" title="You're ready." intro="We'll review what you've shared and start preparing thoughtful matches." />
-            <div className="letter-card p-8">
+            <div className="letter-card p-5 md:p-8">
               <ul className="space-y-3 text-navy/80">
                 <li><strong className="font-serif">Name:</strong> {s.name}, {s.age}</li>
                 <li><strong className="font-serif">City:</strong> {s.city}</li>
@@ -453,7 +453,7 @@ export default function Onboarding() {
 
         {/* Footer nav */}
         {step > 1 && step < TOTAL_STEPS && (
-          <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/40 bg-background/95 backdrop-blur">
+          <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/40 bg-background/95 backdrop-blur" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
             <div className="container flex max-w-2xl items-center justify-between py-4">
               <Button variant="ghost" onClick={back}>
                 <ArrowLeft className="size-4" /> Back
@@ -465,7 +465,7 @@ export default function Onboarding() {
           </div>
         )}
         {step === 1 && s.intent === "yes" && (
-          <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/40 bg-background/95 backdrop-blur">
+          <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/40 bg-background/95 backdrop-blur" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
             <div className="container flex max-w-2xl items-center justify-end py-4">
               <Button variant="warm" onClick={next}>
                 Continue <ArrowRight className="size-4" />

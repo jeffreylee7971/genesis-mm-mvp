@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AppShell from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 import { toast } from "sonner";
 
 type Conversation = {
@@ -32,6 +32,7 @@ export default function Messages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(true);
+  const [mobileView, setMobileView] = useState<"list" | "chat">("list");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Load conversations
@@ -65,6 +66,7 @@ export default function Messages() {
       setConvos(list);
       if (list.length && !activeId) setActiveId(list[0].match_id);
       setLoading(false);
+      // On mobile start on list view; desktop auto-opens first convo
     })();
   }, [user]);
 
@@ -133,18 +135,18 @@ export default function Messages() {
         )}
 
         {convos.length > 0 && (
-          <div className="grid gap-6 md:grid-cols-[280px_1fr] md:max-h-[calc(100vh-180px)]">
+          <div className="grid md:grid-cols-[280px_1fr]" style={{ height: "calc(100svh - 11rem)" }}>
             {/* Conversation list */}
-            <aside className="space-y-2">
+            <aside className={`space-y-2 overflow-y-auto ${mobileView === "chat" ? "hidden md:block" : "block"}`}>
               {convos.map((c) => (
                 <button
                   key={c.match_id}
-                  onClick={() => setActiveId(c.match_id)}
+                  onClick={() => { setActiveId(c.match_id); setMobileView("chat"); }}
                   className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition ${
                     activeId === c.match_id ? "border-terracotta bg-terracotta/5" : "border-border bg-card hover:border-terracotta/40"
                   }`}
                 >
-                  <div className="size-12 overflow-hidden rounded-full bg-cream-deep">
+                  <div className="size-12 shrink-0 overflow-hidden rounded-full bg-cream-deep">
                     {c.other_photo ? (
                       <img src={c.other_photo} alt={c.other_name} className="h-full w-full object-cover" />
                     ) : (
@@ -162,10 +164,17 @@ export default function Messages() {
             </aside>
 
             {/* Active conversation */}
-            <section className="letter-card flex h-[70vh] flex-col overflow-hidden">
+            <section className={`letter-card flex flex-col overflow-hidden ${mobileView === "list" ? "hidden md:flex" : "flex"}`}>
               {active && (
                 <>
-                  <header className="border-b border-border/60 px-5 py-4">
+                  <header className="flex items-center gap-3 border-b border-border/60 px-4 py-3">
+                    <button
+                      className="md:hidden text-navy/60 hover:text-navy"
+                      onClick={() => setMobileView("list")}
+                      aria-label="Back to conversations"
+                    >
+                      <ArrowLeft className="size-5" />
+                    </button>
                     <h2 className="font-serif text-xl text-navy">{active.other_name}</h2>
                   </header>
 
