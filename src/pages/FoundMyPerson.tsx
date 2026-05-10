@@ -45,7 +45,7 @@ export default function FoundMyPerson() {
         .from("users_meta")
         .update({ paused: true })
         .eq("id", user.id);
-      if (pauseErr) throw pauseErr;
+      if (pauseErr) console.warn("Could not pause profile:", pauseErr.message);
 
       setDone(true);
     } catch (e: any) {
