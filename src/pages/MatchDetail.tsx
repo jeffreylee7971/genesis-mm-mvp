@@ -85,6 +85,7 @@ export default function MatchDetail() {
                 open_text_parenting: profile?.open_text_parenting ?? null,
                 open_text_future: profile?.open_text_future ?? null,
                 bio: profile?.bio ?? null,
+                semantic_scores: (profile?.semantic_scores as any) ?? null,
               }
             : null,
         );
@@ -110,6 +111,7 @@ export default function MatchDetail() {
             open_text_parenting: profile?.open_text_parenting ?? null,
             open_text_future: profile?.open_text_future ?? null,
             bio: profile?.bio ?? null,
+            semantic_scores: (profile?.semantic_scores as any) ?? null,
           };
           generateNarrative(v, candidate).then((text) => {
             if (!cancelled) setNarrative(text);

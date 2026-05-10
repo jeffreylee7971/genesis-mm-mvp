@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { triggerProfileScoring } from "@/lib/scoring";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -152,6 +153,8 @@ export default function Onboarding() {
 
       toast.success("Welcome to Genesis. Your matches are being prepared.");
       navigate("/dashboard");
+      // Async, fire-and-forget — no await so navigation is instant
+      triggerProfileScoring(user.id);
     } catch (err: any) {
       toast.error(err.message || "Could not save");
     } finally {

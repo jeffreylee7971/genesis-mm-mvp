@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import PhotoUploader from "@/components/onboarding/PhotoUploader";
 import { toast } from "sonner";
 import { Heart, LogOut, PauseCircle } from "lucide-react";
+import { triggerXScoring } from "@/lib/scoring";
 
 export default function Profile() {
   const { user, signOut } = useAuth();
@@ -63,6 +64,8 @@ export default function Profile() {
         .eq("id", user.id);
       await supabase.from("profiles").update({ bio }).eq("user_id", user.id);
       toast.success("Saved.");
+      // Fire X enrichment if handle is connected — fire-and-forget
+      if (xConnected && xHandle.trim()) triggerXScoring(user.id, xHandle);
     } catch (e: any) {
       toast.error(e.message);
     } finally {

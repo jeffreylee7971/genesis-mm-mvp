@@ -6,6 +6,14 @@
 import { supabase } from "@/integrations/supabase/client";
 import { TIMELINE_OPTIONS } from "@/lib/onboarding-config";
 
+export type SemanticScores = {
+  emotional_maturity: number;
+  growth_mindset: number;
+  responsibility_orientation: number;
+  values_alignment: number;
+  summary?: string;
+};
+
 export type CandidateProfile = {
   user_id: string;
   name: string;
@@ -24,6 +32,7 @@ export type CandidateProfile = {
   open_text_parenting: string | null;
   open_text_future: string | null;
   bio: string | null;
+  semantic_scores: SemanticScores | null;
 };
 
 export type ViewerProfile = CandidateProfile;
@@ -53,15 +62,36 @@ export function categoryAlignment(viewer: ViewerProfile, c: CandidateProfile) {
   const timeline = viewer.family_timeline === c.family_timeline ? 1 : 0.5;
   const parenting = overlap(viewer.parenting_philosophy, c.parenting_philosophy);
   const lifestyle = overlap(viewer.lifestyle, c.lifestyle);
-  // values: relationship structure + children_wanted closeness
   let valuesScore = 0;
   if (viewer.relationship_structure && viewer.relationship_structure === c.relationship_structure) valuesScore += 0.5;
   if (viewer.children_wanted != null && c.children_wanted != null) {
     valuesScore += 0.5 * (1 - Math.min(1, Math.abs(viewer.children_wanted - c.children_wanted) / 4));
   }
 
-  const score = Math.round((timeline * 0.25 + parenting * 0.3 + lifestyle * 0.25 + valuesScore * 0.2) * 100);
-  return { timeline, parenting, lifestyle, values: valuesScore, score };
+  // Layer 3: Grok semantic score similarity — closeness of each dimension (0–1)
+  let semanticScore = 0;
+  const hasSemantics = !!(viewer.semantic_scores && c.semantic_scores);
+  if (hasSemantics) {
+    const dims: (keyof SemanticScores)[] = [
+      "emotional_maturity",
+      "growth_mindset",
+      "responsibility_orientation",
+      "values_alignment",
+    ];
+    const avgDiff =
+      dims.reduce((sum, dim) => {
+        const a = (viewer.semantic_scores![dim] as number) ?? 50;
+        const b = (c.semantic_scores![dim] as number) ?? 50;
+        return sum + Math.abs(a - b);
+      }, 0) / dims.length;
+    semanticScore = 1 - avgDiff / 100;
+  }
+
+  const score = hasSemantics
+    ? Math.round((timeline * 0.2 + parenting * 0.25 + lifestyle * 0.2 + valuesScore * 0.15 + semanticScore * 0.2) * 100)
+    : Math.round((timeline * 0.25 + parenting * 0.3 + lifestyle * 0.25 + valuesScore * 0.2) * 100);
+
+  return { timeline, parenting, lifestyle, values: valuesScore, semantic: semanticScore, score };
 }
 
 export function highlightFor(viewer: ViewerProfile, c: CandidateProfile) {
@@ -105,6 +135,7 @@ export async function fetchViewerFull(userId: string): Promise<ViewerProfile | n
     open_text_parenting: profile.open_text_parenting,
     open_text_future: profile.open_text_future,
     bio: profile.bio,
+    semantic_scores: (profile.semantic_scores as SemanticScores | null) ?? null,
   };
 }
 

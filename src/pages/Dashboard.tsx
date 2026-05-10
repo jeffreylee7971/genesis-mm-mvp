@@ -12,6 +12,7 @@ import {
   highlightFor,
   timelineLabel,
 } from "@/lib/matching";
+import { triggerProfileScoring } from "@/lib/scoring";
 import { Sparkles } from "lucide-react";
 
 export default function Dashboard() {
@@ -29,6 +30,8 @@ export default function Dashboard() {
         return;
       }
       setViewer(v);
+      // Lazy scoring: fire for users who completed onboarding before Step 3 shipped
+      if (!v.semantic_scores) triggerProfileScoring(user.id);
 
       // Generate today's curated matches (no-op if already generated today).
       await supabase.rpc("generate_daily_matches", { _viewer: user.id });
@@ -80,6 +83,7 @@ export default function Dashboard() {
             open_text_parenting: p.open_text_parenting ?? null,
             open_text_future: p.open_text_future ?? null,
             bio: p.bio ?? null,
+            semantic_scores: p.semantic_scores ?? null,
           } as CandidateProfile;
         })
         .filter(Boolean) as CandidateProfile[];
