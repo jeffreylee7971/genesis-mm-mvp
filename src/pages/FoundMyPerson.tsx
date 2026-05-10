@@ -19,16 +19,25 @@ export default function FoundMyPerson() {
     if (!user) return;
     setBusy(true);
     try {
-      await supabase.from("success").insert({
-        user_id: user.id,
-        partner_found: partner || null,
-        stripe_paid: paid,
-      });
-      // Pause the account so they're no longer surfaced.
-      await supabase.from("users_meta").update({ paused: true }).eq("id", user.id);
+      const { error: insertErr } = await supabase.from("success").upsert(
+        {
+          user_id: user.id,
+          partner_found: partner || null,
+          stripe_paid: paid,
+        },
+        { onConflict: "user_id" }
+      );
+      if (insertErr) throw insertErr;
+
+      const { error: pauseErr } = await supabase
+        .from("users_meta")
+        .update({ paused: true })
+        .eq("id", user.id);
+      if (pauseErr) throw pauseErr;
+
       setDone(true);
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || String(e));
     } finally {
       setBusy(false);
     }
