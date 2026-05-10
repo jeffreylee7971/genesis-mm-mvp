@@ -88,6 +88,8 @@ export default function Onboarding() {
         name: meta?.name || (user.user_metadata?.name as string) || "",
         age: meta?.age?.toString() || "",
         city: meta?.city || "",
+        gender: (meta?.gender as any) || "",
+        seeking: (meta?.seeking as any) || "",
         photos: meta?.photos || [],
         family_timeline: profile?.family_timeline || "",
         children_current: profile?.children_current?.toString() || "0",
