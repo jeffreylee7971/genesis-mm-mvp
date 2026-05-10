@@ -21,7 +21,7 @@ export default function MatchDetail() {
   const navigate = useNavigate();
   const [viewer, setViewer] = useState<ViewerProfile | null>(null);
   const [c, setC] = useState<CandidateProfile | null>(null);
-  const [matchStatus, setMatchStatus] = useState<string | null>(null);
+  const [matchRow, setMatchRow] = useState<{ id: string; status: string; initiator: string | null } | null>(null);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
