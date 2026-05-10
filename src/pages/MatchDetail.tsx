@@ -12,14 +12,9 @@ import {
   timelineLabel,
   ViewerProfile,
 } from "@/lib/matching";
+import { getMatchCtaState, getMatchDetailViewState, MatchRow } from "@/lib/match-detail";
 import { toast } from "sonner";
 import { ArrowLeft, Heart } from "lucide-react";
-
-type MatchRow = {
-  id: string;
-  status: "pending" | "mutual" | "connected" | "passed";
-  initiator: string | null;
-};
 
 export default function MatchDetail() {
   const { id } = useParams();
@@ -145,14 +140,17 @@ export default function MatchDetail() {
     }
   };
 
-  if (!loaded)
+  const viewState = getMatchDetailViewState({ loaded, viewer, candidate: c });
+  const ctaState = getMatchCtaState(matchRow, user?.id);
+
+  if (viewState === "loading")
     return (
       <AppShell>
         <div className="container max-w-3xl pt-10 text-navy/50">Loading…</div>
       </AppShell>
     );
 
-  if (!viewer)
+  if (viewState === "viewer-unavailable")
     return (
       <AppShell>
         <div className="container max-w-3xl pt-10">
@@ -164,7 +162,7 @@ export default function MatchDetail() {
       </AppShell>
     );
 
-  if (!c)
+  if (viewState === "candidate-unavailable")
     return (
       <AppShell>
         <div className="container max-w-3xl pt-10">
@@ -249,11 +247,11 @@ export default function MatchDetail() {
 
         {/* CTA */}
         <div className="sticky bottom-20 z-20 sm:bottom-6">
-          {matchRow?.status === "mutual" || matchRow?.status === "connected" ? (
+          {ctaState === "message" ? (
             <Button asChild variant="warm" size="xl" className="w-full">
               <Link to="/messages">Message {c.name.split(" ")[0]}</Link>
             </Button>
-          ) : matchRow?.status === "pending" && matchRow.initiator === user?.id ? (
+          ) : ctaState === "interest-expressed" ? (
             <Button disabled variant="quiet" size="xl" className="w-full">
               Interest expressed
             </Button>
