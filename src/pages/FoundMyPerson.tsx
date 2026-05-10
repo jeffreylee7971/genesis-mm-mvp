@@ -27,16 +27,30 @@ export default function FoundMyPerson() {
       });
   }, [user]);
 
-  const celebrate = async (paid: boolean) => {
+  const payWithStripe = async () => {
+    if (!user) return;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id, partner_found: partner || null }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "checkout failed");
+      window.location.href = data.url;
+    } catch (e: any) {
+      toast.error(e.message || String(e));
+      setBusy(false);
+    }
+  };
+
+  const skipPayment = async () => {
     if (!user) return;
     setBusy(true);
     try {
       const { error: insertErr } = await supabase.from("success").upsert(
-        {
-          user_id: user.id,
-          partner_found: partner || null,
-          stripe_paid: paid,
-        },
+        { user_id: user.id, partner_found: partner || null, stripe_paid: false },
         { onConflict: "user_id" }
       );
       if (insertErr) throw insertErr;
@@ -103,10 +117,10 @@ export default function FoundMyPerson() {
           </div>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button variant="gold" size="lg" className="flex-1" onClick={() => celebrate(true)} disabled={busy}>
+            <Button variant="gold" size="lg" className="flex-1" onClick={payWithStripe} disabled={busy}>
               Pay $99
             </Button>
-            <Button variant="quiet" size="lg" className="flex-1" onClick={() => celebrate(false)} disabled={busy}>
+            <Button variant="quiet" size="lg" className="flex-1" onClick={skipPayment} disabled={busy}>
               Skip for now
             </Button>
           </div>

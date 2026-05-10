@@ -13,6 +13,7 @@ import MatchDetail from "./pages/MatchDetail.tsx";
 import Messages from "./pages/Messages.tsx";
 import Profile from "./pages/Profile.tsx";
 import FoundMyPerson from "./pages/FoundMyPerson.tsx";
+import PaymentSuccess from "./pages/PaymentSuccess.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -75,6 +76,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
